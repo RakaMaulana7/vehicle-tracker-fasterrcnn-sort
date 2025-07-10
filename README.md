@@ -1,59 +1,60 @@
-## 🔍 Penjelasan tracking.py
+## 🔍 Overview of `tracking.py`
 
-File `tracking.py` merupakan inti dari sistem pelacakan kendaraan secara real-time. Skrip ini mendeteksi kendaraan dari stream CCTV dan melacaknya menggunakan algoritma SORT (Simple Online and Realtime Tracking).
+The `tracking.py` script is the core component of this vehicle tracking system. It detects vehicles in real-time from a CCTV video stream using the **Faster R-CNN** object detection model and tracks them using the **SORT (Simple Online and Realtime Tracking)** algorithm.
 
-### 🔧 Teknologi yang Digunakan
+### 🔧 Technologies Used
 
-- **PyTorch**: Untuk memuat dan menjalankan model deteksi objek Faster R-CNN.
-- **Torchvision**: Menyediakan model deteksi pretrained.
-- **OpenCV**: Untuk pengambilan dan pemrosesan frame video.
-- **NumPy**: Untuk manipulasi array numerik.
-- **SORT**: Algoritma pelacakan real-time berbasis Kalman Filter.
+- **PyTorch**: For loading and running the object detection model.
+- **Torchvision**: Provides pretrained models including Faster R-CNN.
+- **OpenCV**: For capturing and processing video frames.
+- **NumPy**: For numerical operations.
+- **SORT**: Lightweight real-time tracking algorithm based on Kalman Filter and data association.
 
 ---
 
-### ⚙️ Alur Kerja tracking.py
+### ⚙️ Workflow
 
-1. **Inisialisasi:**
-   - Model `fasterrcnn_resnet50_fpn` diload dengan bobot pretrained dari dataset COCO.
-   - Stream CCTV dibuka dari URL HLS (`.m3u8`) menggunakan OpenCV.
+1. **Initialization**:
+   - Loads the `fasterrcnn_resnet50_fpn` model with pretrained COCO weights.
+   - Opens a CCTV stream via an HLS `.m3u8` URL using OpenCV.
 
-2. **Frame Processing Loop:**
-   - Setiap frame dari CCTV dibaca dan diperkecil ukurannya.
-   - Frame dikonversi dari BGR ke RGB lalu diubah menjadi tensor.
-   - Diberikan ke model deteksi untuk menghasilkan prediksi (bounding box, skor, dan label objek).
+2. **Processing Video Frames**:
+   - Reads frames from the video stream and resizes them for efficiency.
+   - Converts frames from BGR to RGB, then to PyTorch tensors.
+   - Passes the image tensor to the model to get predictions (bounding boxes, scores, and labels).
 
-3. **Filtering Deteksi:**
-   - Hanya objek dengan label kendaraan (car, motorcycle, bus, truck) dan skor > 0.5 yang diproses.
-   - Koordinat bounding box + confidence dimasukkan ke dalam array deteksi.
+3. **Filtering Detections**:
+   - Filters detections to only keep vehicles (`car`, `motorcycle`, `bus`, `truck`) with confidence scores above 0.5.
+   - Prepares the bounding boxes and scores in a format required by the tracker.
 
-4. **Pelacakan:**
-   - Deteksi dikirim ke tracker `Sort` untuk dilacak antar frame.
-   - Setiap objek diberi ID unik.
+4. **Object Tracking**:
+   - Sends detections to the `Sort` tracker, which assigns unique IDs to tracked objects across frames.
 
-5. **Hitung Kendaraan:**
-   - Jika ID kendaraan belum pernah muncul, akan dihitung satu kali.
-   - Jumlah total kendaraan ditampilkan di layar.
+5. **Vehicle Counting**:
+   - Keeps track of unique vehicle IDs to ensure each vehicle is only counted once.
+   - Displays the running total of detected vehicles.
 
-6. **Visualisasi:**
-   - Bounding box dan ID objek ditampilkan di atas frame.
-   - Total kendaraan ditampilkan di kiri atas layar.
-   - Tekan tombol `q` untuk keluar dari tampilan.
+6. **Visualization**:
+   - Draws bounding boxes and IDs on the video frames.
+   - Displays the current vehicle count at the top-left corner.
+   - Press `q` to quit the video stream display.
 
 ---
 
 ### 📺 Output
 
-- Frame video real-time dengan kotak hijau dan ID di setiap kendaraan.
-- Teks "Vehicle Count: X" di kiri atas layar menunjukkan total kendaraan terdeteksi dan dihitung.
+- Live video stream with green bounding boxes and unique IDs for each vehicle.
+- Vehicle count displayed on-screen with the text:  
+  **"Vehicle Count: X"**
 
 ---
 
-### 📌 Catatan
+### 📌 Notes
 
-- URL CCTV default adalah:
+- Default CCTV stream URL:
 https://cctvkanjeng.gresikkab.go.id/stream/10.120.0.117/index-10.120.0.117.m3u8
 
-Kamu bisa menggantinya dengan stream CCTV lain (pastikan mendukung `.m3u8` HLS).
+You can replace this with another `.m3u8` stream URL if needed.
 
-- Untuk menghentikan proses, tekan tombol `q` saat tampilan video aktif.
+- Press **`q`** during video display to stop the program and release resources.
+
